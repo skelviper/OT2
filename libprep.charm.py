@@ -83,8 +83,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     def _pick_up(pipette, loc=None):
         if tip_log[pipette]['count'] == tip_log[pipette]['max'] and not loc:
-            protocol.pause('Replace ' + str(pipette.max_volume) + 'µl tipracks before \
-resuming.')
+            protocol.pause('Replace ' + str(pipette.max_volume) + 'µl tipracks before resuming.')
             pipette.reset_tipracks()
             tip_log[pipette]['count'] = 0
         if loc:
