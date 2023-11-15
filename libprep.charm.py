@@ -20,7 +20,13 @@ metadata = {
 ################CHARM library prep configuration################
 malbac_product_concentration_columns = [30,30,30,30,30,30,30,30,30,30,30,30]
 folder_path = './'
+if_dry_run = True
 ################End CHARM library prep configuration################
+
+if if_dry_run:
+    col_num = 2
+else:
+    col_num = 12
 
 def run(protocol: protocol_api.ProtocolContext):
     if not protocol.rail_lights_on:
@@ -108,7 +114,7 @@ resuming.')
 
     # transfer water to dilute plate
     _pick_up(pipette)
-    for i in range(12):
+    for i in range(col_num):
         pipette.aspirate(water_volume[i], water[0].bottom()) 
         pipette.dispense(water_volume[i], dilute_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.move_to(dilute_plate.columns_by_name()[str(i+1)][0].bottom(20))
@@ -118,7 +124,7 @@ resuming.')
     # transfer TranspositionMix to pcr plate
     TranspositionMix_volume = 6
     _pick_up(pipette)
-    for i in range(12):
+    for i in range(col_num):
         pipette.aspirate(TranspositionMix_volume, TranspositionMix[0].bottom())
         pipette.dispense(TranspositionMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
@@ -126,7 +132,7 @@ resuming.')
     pipette.drop_tip()
 
     # transfer malbac products to dilute plate, mix, and transfer to pcr plate
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -145,7 +151,7 @@ resuming.')
     SDS_volume = 2.5
     half_lib_volume = 6.25
 
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(SDS_volume, SDS[0].bottom())
         pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -162,7 +168,11 @@ resuming.')
         protocol.set_rail_lights(not protocol.rail_lights_on)
         protocol.delay(seconds=1)
     # incubate at RT for 10 min
-    protocol.delay(minutes=9, seconds=54)
+    if if_dry_run:
+        protocol.delay(seconds=1)
+        protocol.comment('Dry run, no incubation')
+    else:
+        protocol.delay(minutes=9, seconds=54)
 
     del protocol.deck['3']
     del protocol.deck['6']
@@ -176,7 +186,7 @@ resuming.')
     # for Hi-C library
     i5_volume = 2
     i7_volume = 2
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i5_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -184,7 +194,7 @@ resuming.')
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i7_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -195,7 +205,7 @@ resuming.')
 
     # transfer PCR mix to pcr plate
     PCRMix_volume = 9.75
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(PCRMix_volume, PCRMix[0].bottom())
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -212,7 +222,7 @@ resuming.')
 
     # transfer enriched PCR mix to enrich plate
     enrich_PCRMix_volume = 11.75
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix[0].bottom())
         pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -223,7 +233,7 @@ resuming.')
 
     # transfer i5 index to enrich plate
     i5_volume = 2
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i5_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
@@ -237,7 +247,7 @@ resuming.')
 
     # trnasfer i7 index to enrich plate
     i7_volume = 2
-    for i in range(12):
+    for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i7_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
