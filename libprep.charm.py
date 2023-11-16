@@ -48,7 +48,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     tip_track = True
     
-    # load labwares
+    # load labwares in jupyter 
     # with open('./xinglab_pcr96well_semiskirt_280ul.json') as labware_file:
     #     labware_def = json.load(labware_file)
 
