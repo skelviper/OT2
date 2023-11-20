@@ -22,8 +22,7 @@ def speaker():
     try:
         run_quiet_process('mpg123 {}'.format(AUDIO_FILE_PATH))
     except KeyboardInterrupt:
-        pass
-        print()
+        print("cancel")
 
 metadata = {
     'protocolName': 'Automated CHARM library prep protocol',
@@ -32,12 +31,12 @@ metadata = {
 }
 
 ################CHARM library prep configuration################
-malbac_product_concentration_columns = [30,30,30,30,30,30,30,30,30,30,30,30]
+malbac_product_concentration_columns = [55,55,55,55,55,55,55,55,55,55,55,55]
 if_dry_run = True
 ################End CHARM library prep configuration################
 
 if if_dry_run:
-    col_num = 2
+    col_num = 3
 else:
     col_num = 12
 
@@ -46,8 +45,6 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.set_rail_lights(True)
     protocol.home()
 
-    tip_track = True
-    
     # load labwares in jupyter 
     # with open('./xinglab_pcr96well_semiskirt_280ul.json') as labware_file:
     #     labware_def = json.load(labware_file)
@@ -78,11 +75,12 @@ def run(protocol: protocol_api.ProtocolContext):
         try:
             pipette.pick_up_tip()
         except protocol_api.labware.OutOfTipsError:
-            speaker()
-            for _ in range(16):
+            for _ in range(8):
                 protocol.set_rail_lights(not protocol.rail_lights_on)
-                protocol.delay(seconds=0.4)
-            ctx.pause("Replace empty tip racks")
+                if protocol.rail_lights_on:
+                    speaker()
+                protocol.delay(seconds=0.2)
+            protocol.pause("Replace empty tip racks")
             pipette.reset_tipracks()
             pipette.pick_up_tip()
     
@@ -130,19 +128,20 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 16,rate=10)
+        pipette.mix(10, 16,rate=10,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.aspirate(malbac_product_volume*2, dilute_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(malbac_product_volume*2, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10,8,rate=10)
+        pipette.mix(10,8,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
 
     # Pause for Tn5 reaction
-    speaker()
-    for _ in range(16):
+    for _ in range(8):
         protocol.set_rail_lights(not protocol.rail_lights_on)
-        protocol.delay(seconds=0.4)
+        if protocol.rail_lights_on:
+            speaker()
+        protocol.delay(seconds=0.2)
     protocol.pause('Pause and transfer PCR plate to thermocycler for Tn5 reaction')
 
     # transfer SDS to pcr plate and split the library into two plates(Hi-C & Enrich)
@@ -153,7 +152,7 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(SDS_volume, SDS.bottom())
         pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 10,rate=10)
+        pipette.mix(10, 10,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.aspirate(half_lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(half_lib_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.move_to(enrich_plate.columns_by_name()[str(i+1)][0].bottom(20))
@@ -161,17 +160,14 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.drop_tip()
     
     # replace 3 and 6 with i5/i7 index , while SDS reaction
-    speaker()
-    for _ in range(16):
+    for _ in range(8):
         protocol.set_rail_lights(not protocol.rail_lights_on)
-        protocol.delay(seconds=0.4)
+        if protocol.rail_lights_on:
+            speaker()
+        protocol.delay(seconds=0.2)
     protocol.pause('Please replace 3 and 6 with i5/i7 index, while SDS reaction')
     # incubate at RT for 10 min
-    if if_dry_run:
-        protocol.delay(seconds=1)
-        protocol.comment('Dry run, no incubation')
-    else:
-        protocol.delay(minutes=9, seconds=54)
+    # protocol.delay(minutes=10)
 
     del protocol.deck['3']
     del protocol.deck['6']
@@ -210,16 +206,17 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(PCRMix_volume, PCRMix.bottom())
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 15,rate=10)
+        pipette.mix(10, 15,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
 
     # Pause for library amplification
-    speaker()
-    for _ in range(16):
+    for _ in range(8):
         protocol.set_rail_lights(not protocol.rail_lights_on)
-        protocol.delay(seconds=0.4)
+        if protocol.rail_lights_on:
+            speaker()
+        protocol.delay(seconds=0.2)
     protocol.pause('Pause. 1. Transfer PCR plate to thermocycler for library amplification. 2. replace i5/i7 index for enrich lib.')
 
     # transfer enriched PCR mix to enrich plate
@@ -239,16 +236,17 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i5_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 15,rate=10)
+        pipette.mix(10, 15,rate=10, location = enrich_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.move_to(enrich_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
 
     # Pause for library amplification
-    speaker()
-    for _ in range(16):
+    for _ in range(8):
         protocol.set_rail_lights(not protocol.rail_lights_on)
-        protocol.delay(seconds=0.4)
+        if protocol.rail_lights_on:
+            speaker()
+        protocol.delay(seconds=0.2)
     protocol.pause('Pause and transfer enrich plate to thermocycler for library amplification')
 
     # trnasfer i7 index to enrich plate
@@ -257,16 +255,17 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom())
         pipette.dispense(i7_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 15,rate=10)
+        pipette.mix(10, 15,rate=10, location = enrich_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
         pipette.move_to(enrich_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
     
     # Pause for library amplification
-    speaker()
-    for _ in range(16):
+    for _ in range(8):
         protocol.set_rail_lights(not protocol.rail_lights_on)
-        protocol.delay(seconds=0.4)
+        if protocol.rail_lights_on:
+            speaker()
+        protocol.delay(seconds=0.2)
     protocol.pause('Pause and transfer enrich plate to thermocycler for library amplification')
 
     protocol.comment('Protocol complete!')
