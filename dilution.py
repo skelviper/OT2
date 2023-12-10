@@ -66,24 +66,16 @@ def run(protocol: protocol_api.ProtocolContext):
     water = plate.wells_by_name()['A1']
     dna = plate.wells_by_name()['A2']
 
-
-    for _ in range(8):
-        protocol.set_rail_lights(not protocol.rail_lights_on)
-        if protocol.rail_lights_on:
-            speaker()
-        protocol.delay(seconds=0.2)
-    protocol.pause('Start to add water? Press resume to continue')
-
     _pick_up(pipette)
 
     pipette.aspirate(8.75, water.bottom(bottom_offset))
-    pipette.dispense(8.75, plate.columns_by_name()['11'][0].bottom(bottom_offset))
-    pipette.move_to(plate.columns_by_name()['11'][0].bottom(20))
+    pipette.dispense(8.75, plate.columns_by_name()['3'][0].bottom(bottom_offset))
+    pipette.move_to(plate.columns_by_name()['3'][0].bottom(20))
     pipette.blow_out()
 
     pipette.aspirate(8.75, water.bottom(bottom_offset))
-    pipette.dispense(8.75, plate.columns_by_name()['12'][0].bottom(bottom_offset))
-    pipette.move_to(plate.columns_by_name()['12'][0].bottom(20))
+    pipette.dispense(8.75, plate.columns_by_name()['4'][0].bottom(bottom_offset))
+    pipette.move_to(plate.columns_by_name()['4'][0].bottom(20))
     pipette.blow_out()
 
     pipette.drop_tip()
@@ -99,17 +91,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
     _pick_up(pipette)
     pipette.aspirate(1.25, dna.bottom(bottom_offset))
-    pipette.dispense(1.25, plate.columns_by_name()['11'][0].bottom(bottom_offset))
-    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['11'][0].bottom(1))
-    pipette.move_to(plate.columns_by_name()['11'][0].bottom(20))
+    pipette.dispense(1.25, plate.columns_by_name()['3'][0].bottom(bottom_offset))
+    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['3'][0].bottom(1))
+    pipette.move_to(plate.columns_by_name()['3'][0].bottom(20))
     pipette.blow_out()
     pipette.drop_tip()
 
     _pick_up(pipette)
     pipette.aspirate(1.25, dna.bottom(bottom_offset))
-    pipette.dispense(1.25, plate.columns_by_name()['12'][0].bottom(bottom_offset))
-    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['12'][0].bottom(1))
-    pipette.move_to(plate.columns_by_name()['12'][0].bottom(20))
+    pipette.dispense(1.25, plate.columns_by_name()['4'][0].bottom(bottom_offset))
+    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['4'][0].bottom(1))
+    pipette.move_to(plate.columns_by_name()['4'][0].bottom(20))
     pipette.blow_out()
     pipette.drop_tip()
 

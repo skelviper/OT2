@@ -8,20 +8,18 @@ Automated nextera library prep protocol
 from opentrons import protocol_api
 # import opentrons.execute # in jupyter
 import time
-import json
-import math
 import os
 import subprocess
 
-################CHARM library prep configuration################
+################Configuration################
 #malbac_product_concentration_columns = [55,55,55,55,55,55,55,55,55,55,55,55]
 malbac_product_concentration_columns = [55 for i in range(12)]
-if_dry_run = True
-################End CHARM library prep configuration############
+if_dry_run = False
+bottom_offset = 0.5
+################End configuration############
 
 # define constant
-AUDIO_FILE_PATH = '/etc/audio/reminder_tone.mp3' 
-
+AUDIO_FILE_PATH = '/var/lib/jupyter/notebooks/reminder_tone.mp3' 
 
 # define custom functions
 def run_quiet_process(command): 
@@ -48,19 +46,18 @@ else:
     col_num = 12
 
 def run(protocol: protocol_api.ProtocolContext):
-
     def _pick_up(pipette):
-    try:
-        pipette.pick_up_tip()
-    except protocol_api.labware.OutOfTipsError:
-        for _ in range(8):
-            protocol.set_rail_lights(not protocol.rail_lights_on)
-            if protocol.rail_lights_on:
-                speaker()
-            protocol.delay(seconds=0.2)
-        protocol.pause("Replace empty tip racks")
-        pipette.reset_tipracks()
-        pipette.pick_up_tip()
+        try:
+            pipette.pick_up_tip()
+        except protocol_api.labware.OutOfTipsError:
+            for _ in range(8):
+                protocol.set_rail_lights(not protocol.rail_lights_on)
+                if protocol.rail_lights_on:
+                    speaker()
+                protocol.delay(seconds=0.2)
+            protocol.pause("Replace empty tip racks")
+            pipette.reset_tipracks()
+            pipette.pick_up_tip()
 
     if not protocol.rail_lights_on:
         protocol.set_rail_lights(True)
@@ -96,8 +93,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # transfer water to dilute plate
     _pick_up(pipette)
     for i in range(col_num):
-        pipette.aspirate(water_volume[i], water.bottom()) 
-        pipette.dispense(water_volume[i], dilute_plate.columns_by_name()[str(i+1)][0].bottom())
+        pipette.aspirate(water_volume[i], water.bottom(bottom_offset)) 
+        pipette.dispense(water_volume[i], dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(dilute_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
     pipette.drop_tip()
@@ -106,8 +103,8 @@ def run(protocol: protocol_api.ProtocolContext):
     TranspositionMix_volume = 3
     _pick_up(pipette)
     for i in range(col_num):
-        pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom())
-        pipette.dispense(TranspositionMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
+        pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(bottom_offset))
+        pipette.dispense(TranspositionMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
     pipette.drop_tip()
@@ -115,12 +112,12 @@ def run(protocol: protocol_api.ProtocolContext):
     # transfer malbac products to dilute plate, mix, and transfer to pcr plate
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 16,rate=10,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
-        pipette.aspirate(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.dispense(malbac_product_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10,4,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
+        pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 16,rate=10,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.aspirate(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.dispense(malbac_product_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10,4,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -139,10 +136,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(SDS_volume, SDS.bottom())
-        pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 5,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
-        pipette.aspirate(lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
+        pipette.aspirate(SDS_volume, SDS.bottom(bottom_offset))
+        pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 5,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.aspirate(lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -173,16 +170,16 @@ def run(protocol: protocol_api.ProtocolContext):
     i7_volume = 2
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.dispense(i5_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
+        pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.dispense(i5_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         #pipette.mix(10, 6,rate=10)
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.dispense(i7_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
+        pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.dispense(i7_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         #pipette.mix(10, 8,rate=10)
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
@@ -192,9 +189,9 @@ def run(protocol: protocol_api.ProtocolContext):
     PCRMix_volume = 9.75
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(PCRMix_volume, PCRMix.bottom())
-        pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom())
-        pipette.mix(10, 15,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(1.5))
+        pipette.aspirate(PCRMix_volume, PCRMix.bottom(bottom_offset))
+        pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 15,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
