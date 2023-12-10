@@ -34,19 +34,6 @@ def speaker():
         run_quiet_process('mpg123 {}'.format(AUDIO_FILE_PATH))
     except KeyboardInterrupt:
         print("cancel")
-
-def _pick_up(pipette):
-    try:
-        pipette.pick_up_tip()
-    except protocol_api.labware.OutOfTipsError:
-        for _ in range(8):
-            protocol.set_rail_lights(not protocol.rail_lights_on)
-            if protocol.rail_lights_on:
-                speaker()
-            protocol.delay(seconds=0.2)
-        protocol.pause("Replace empty tip racks")
-        pipette.reset_tipracks()
-        pipette.pick_up_tip()
     
 
 metadata = {
@@ -61,6 +48,20 @@ else:
     col_num = 12
 
 def run(protocol: protocol_api.ProtocolContext):
+
+    def _pick_up(pipette):
+    try:
+        pipette.pick_up_tip()
+    except protocol_api.labware.OutOfTipsError:
+        for _ in range(8):
+            protocol.set_rail_lights(not protocol.rail_lights_on)
+            if protocol.rail_lights_on:
+                speaker()
+            protocol.delay(seconds=0.2)
+        protocol.pause("Replace empty tip racks")
+        pipette.reset_tipracks()
+        pipette.pick_up_tip()
+
     if not protocol.rail_lights_on:
         protocol.set_rail_lights(True)
     protocol.home()
