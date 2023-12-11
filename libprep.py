@@ -2,7 +2,7 @@
 Automated nextera library prep protocol
 @Author: zliu
 @Version: 0.1
-@Date: 2023-11-15
+@Date: 2023-12-11
 """
 
 from opentrons import protocol_api
@@ -67,7 +67,7 @@ def run(protocol: protocol_api.ProtocolContext):
     reagent_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='9')
     dilute_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
     pcr_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
-    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','5','7','8','10','11']]
+    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','7','8','10','11']]
 
     # load instrument
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=tipracks)
@@ -114,16 +114,16 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10, 16,rate=10,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 10,rate=15,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.aspirate(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10,4,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10,4,rate=15, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
 
     # Pause for Tn5 reaction
-    for _ in range(8):
+    for _ in range(4):
         protocol.set_rail_lights(not protocol.rail_lights_on)
         if protocol.rail_lights_on:
             speaker()
@@ -145,7 +145,7 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.drop_tip()
     
     # replace 3 and 6 with i5/i7 index , while SDS reaction
-    for _ in range(8):
+    for _ in range(4):
         protocol.set_rail_lights(not protocol.rail_lights_on)
         if protocol.rail_lights_on:
             speaker()
@@ -168,6 +168,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # for Hi-C library
     i5_volume = 2
     i7_volume = 2
+
     for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
@@ -197,12 +198,12 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.drop_tip()
 
     # Pause for library amplification
-    for _ in range(8):
+    for _ in range(4):
         protocol.set_rail_lights(not protocol.rail_lights_on)
         if protocol.rail_lights_on:
             speaker()
         protocol.delay(seconds=0.2)
-    protocol.pause('Pause. 1. Transfer PCR plate to thermocycler for library amplification. 2. replace i5/i7 index for enrich lib.')
+    protocol.pause('Pause. Transfer PCR plate to thermocycler for library amplification.')
 
     protocol.comment('Protocol complete!')
     
