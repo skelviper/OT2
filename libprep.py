@@ -13,7 +13,7 @@ import subprocess
 
 ################Configuration################
 #malbac_product_concentration_columns = [55,55,55,55,55,55,55,55,55,55,55,55]
-malbac_product_concentration_columns = [55 for i in range(12)]
+malbac_product_concentration_columns = [42 for i in range(12)]
 if_dry_run = False
 bottom_offset = 0.5
 ################End configuration############
@@ -114,10 +114,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10, 10,rate=15,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 10,rate=15,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10,4,rate=15, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10,4.5,rate=15, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -132,14 +132,12 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # transfer SDS to pcr plate and split the library into two plates(Hi-C & Enrich)
     SDS_volume = 1.25
-    lib_volume = 6.25
 
     for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(SDS_volume, SDS.bottom(bottom_offset))
         pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10, 5,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.aspirate(lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 4,rate=15, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -173,7 +171,6 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i5_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        #pipette.mix(10, 6,rate=10)
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -181,7 +178,6 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i7_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        #pipette.mix(10, 8,rate=10)
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
@@ -192,7 +188,7 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(PCRMix_volume, PCRMix.bottom(bottom_offset))
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(10, 15,rate=10, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.mix(10, 15,rate=15, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.move_to(pcr_plate.columns_by_name()[str(i+1)][0].bottom(20))
         pipette.blow_out()
         pipette.drop_tip()
