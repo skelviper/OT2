@@ -1,5 +1,5 @@
 """
-Dilution test for calibration
+Dilution test for viscous liquid 
 @Author: zliu
 @Version: 0.1
 @Date: 2023-12-10
@@ -7,6 +7,7 @@ Dilution test for calibration
 
 from opentrons import protocol_api
 import subprocess
+import time
 
 # define constant
 AUDIO_FILE_PATH = '/var/lib/jupyter/notebooks/reminder_tone.mp3' 
@@ -26,7 +27,7 @@ def speaker():
     
 
 metadata = {
-    'protocolName': 'Dilution test for calibration',
+    'protocolName': 'viscous liquid test for calibration',
     'author': 'zliu <skelviper@hotmail.com>',
     'apiLevel': '2.13' 
 }
@@ -49,9 +50,6 @@ def run(protocol: protocol_api.ProtocolContext):
     if not protocol.rail_lights_on:
         protocol.set_rail_lights(True)
     protocol.home()
-    
-
-    # plate col def: water,dna,1.25 dilute to 10, 2.5 dilute to 10
 
     plate = protocol.load_labware('pcr96well_nonskirt_280ul', location = '2')
     tiprack = protocol.load_labware('axygen_96_diytiprack_10ul', location = '1')
@@ -64,48 +62,22 @@ def run(protocol: protocol_api.ProtocolContext):
     bottom_offset = 0.5
 
     water = plate.wells_by_name()['A1']
-    dna = plate.wells_by_name()['A2']
 
     _pick_up(pipette)
 
-    pipette.aspirate(8.75, water.bottom(bottom_offset))
-    pipette.dispense(8.75, plate.columns_by_name()['3'][0].bottom(bottom_offset))
-    pipette.move_to(plate.columns_by_name()['3'][0].bottom(20))
-    pipette.blow_out()
+    for i in range(11):
+        pipette.aspirate(3, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
+        pipette.move_to(water.top(20))
+        time.sleep(2)
+        pipette.dispense(3, water.bottom(bottom_offset))
 
-    pipette.aspirate(8.75, water.bottom(bottom_offset))
-    pipette.dispense(8.75, plate.columns_by_name()['4'][0].bottom(bottom_offset))
-    pipette.move_to(plate.columns_by_name()['4'][0].bottom(20))
-    pipette.blow_out()
+    protocol.pause("")
 
-    pipette.drop_tip()
-
-    for _ in range(8):
-        protocol.set_rail_lights(not protocol.rail_lights_on)
-        if protocol.rail_lights_on:
-            speaker()
-        protocol.delay(seconds=0.2)
-    protocol.pause('Start to add water? Press resume to continue')
-
-    # add DNA to water
-
-    _pick_up(pipette)
-    pipette.aspirate(1.25, dna.bottom(bottom_offset))
-    pipette.dispense(1.25, plate.columns_by_name()['3'][0].bottom(bottom_offset))
-    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['3'][0].bottom(1))
-    pipette.move_to(plate.columns_by_name()['3'][0].bottom(20))
-    pipette.blow_out()
-    pipette.drop_tip()
-
-    _pick_up(pipette)
-    pipette.aspirate(1.25, dna.bottom(bottom_offset))
-    pipette.dispense(1.25, plate.columns_by_name()['4'][0].bottom(bottom_offset))
-    pipette.mix(10, 7.5,rate=15, location=plate.columns_by_name()['4'][0].bottom(1))
-    pipette.move_to(plate.columns_by_name()['4'][0].bottom(20))
-    pipette.blow_out()
-    pipette.drop_tip()
-
-
+    for i in range(11):
+        pipette.aspirate(3, water.bottom(bottom_offset))
+        pipette.dispense(3, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
+        pipette.move_to(plate.columns_by_name()[str(i+2)][0].top(20))
+        time.sleep(2)
 
     protocol.comment('Protocol complete!')
 
