@@ -13,7 +13,7 @@ import math
 import os
 import subprocess
 
-AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3' 
+AUDIO_FILE_PATH = '/var/lib/jupyter/notebooks/reminder_tone.mp3' 
 def run_quiet_process(command): 
     subprocess.check_output('{} &> /dev/null'.format(command), shell=True) 
 def speaker(): 
@@ -31,8 +31,8 @@ metadata = {
 }
 
 ################CHARM library prep configuration################
-malbac_product_concentration_columns = [55,55,55,55,55,55,55,55,55,55,55,55]
-if_dry_run = True
+malbac_product_concentration_columns = [35 for i in range(12)]
+if_dry_run = False
 bottom_offset = 0.5
 ################End CHARM library prep configuration################
 
@@ -109,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 16,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.mix(5, 12,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(malbac_product_volume*2, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume*2, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.mix(5,8,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
@@ -177,7 +177,6 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(PCRMix_volume, PCRMix.bottom(bottom_offset))
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 15,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.drop_tip()
 
     # Pause for library amplification
@@ -188,21 +187,20 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(seconds=0.2)
     protocol.pause('Pause. 1. Transfer PCR plate to thermocycler for library amplification. 2. replace i5/i7 index for enrich lib.')
 
-    # transfer enriched PCR mix to enrich plate
-    enrich_PCRMix_volume = 11.75
-    for i in range(col_num):
-        _pick_up(pipette)
-        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(bottom_offset))
-        pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
-
     # transfer i5 index to enrich plate
     i5_volume = 2
     for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i5_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 15,rate=20, location = enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.drop_tip()
+
+    # transfer enriched PCR mix to enrich plate
+    enrich_PCRMix_volume = 11.75
+    for i in range(col_num):
+        _pick_up(pipette)
+        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(bottom_offset))
+        pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.drop_tip()
 
     # Pause for library amplification
@@ -219,7 +217,6 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i7_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 15,rate=20, location = enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.drop_tip()
     
     # Pause for library amplification
