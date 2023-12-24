@@ -129,7 +129,7 @@
     },
     "metadata": {
         "displayName": "DIY Axygen Tip Rack 10 µL",
-        "displayCategory": "wellPlate",
+        "displayCategory": "tipRack",
         "displayVolumeUnits": "µL",
         "tags": []
     },
@@ -1122,7 +1122,7 @@
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {
         "x": 0,
-        "y": -2,
+        "y": 0,
         "z": 0
     }
 }

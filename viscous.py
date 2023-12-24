@@ -35,9 +35,12 @@ metadata = {
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    def _pick_up(pipette):
+    def _pick_up(pipette,location=None):
         try:
-            pipette.pick_up_tip()
+            if location is None:
+                pipette.pick_up_tip(presses=2)
+            else:
+                pipette.pick_up_tip(presses=2, location=location)
         except protocol_api.labware.OutOfTipsError:
             for _ in range(8):
                 protocol.set_rail_lights(not protocol.rail_lights_on)
@@ -52,7 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.home()
 
     plate = protocol.load_labware('pcr96well_nonskirt_280ul', location = '2')
-    tiprack = protocol.load_labware('axygen_96_diytiprack_10ul', location = '1')
+    tiprack = protocol.load_labware('axygen_96_diytiprack_10ul', location = '8')
 
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tiprack])
 
@@ -63,21 +66,24 @@ def run(protocol: protocol_api.ProtocolContext):
 
     water = plate.wells_by_name()['A1']
 
-    _pick_up(pipette)
+    _pick_up(pipette,location=tiprack.wells_by_name()['A4'])
 
     for i in range(11):
-        pipette.aspirate(3, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
-        pipette.move_to(water.top(20))
-        time.sleep(2)
-        pipette.dispense(3, water.bottom(bottom_offset))
+        pipette.aspirate(10, water.bottom(bottom_offset))
+        #pipette.move_to(water.top(20))
+        #time.sleep(2)
+        pipette.dispense(10, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
+        #pipette.move_to(plate.columns_by_name()[str(i+2)][0].top(20))
+        #time.sleep(2)
 
     protocol.pause("")
 
     for i in range(11):
-        pipette.aspirate(3, water.bottom(bottom_offset))
-        pipette.dispense(3, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
-        pipette.move_to(plate.columns_by_name()[str(i+2)][0].top(20))
-        time.sleep(2)
+        pipette.aspirate(10, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
+        #pipette.move_to(water.top(20))
+        #time.sleep(2)
+        pipette.dispense(10, water.bottom(bottom_offset))
+
 
     protocol.comment('Protocol complete!')
 

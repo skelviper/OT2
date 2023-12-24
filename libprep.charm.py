@@ -31,7 +31,7 @@ metadata = {
 }
 
 ################CHARM library prep configuration################
-malbac_product_concentration_columns = [35 for i in range(12)]
+malbac_product_concentration_columns = [55 for i in range(12)]
 if_dry_run = False
 bottom_offset = 0.5
 ################End CHARM library prep configuration################
@@ -97,7 +97,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.drop_tip()
 
     # transfer TranspositionMix to pcr plate
-    TranspositionMix_volume = 6
+    TranspositionMix_volume = 6.15
     _pick_up(pipette)
     for i in range(col_num):
         pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(bottom_offset))
