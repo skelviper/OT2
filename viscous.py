@@ -38,9 +38,9 @@ def run(protocol: protocol_api.ProtocolContext):
     def _pick_up(pipette,location=None):
         try:
             if location is None:
-                pipette.pick_up_tip(presses=2)
+                pipette.pick_up_tip(presses=2,increment=3.5)
             else:
-                pipette.pick_up_tip(presses=2, location=location)
+                pipette.pick_up_tip(presses=2,increment=3.5, location=location)
         except protocol_api.labware.OutOfTipsError:
             for _ in range(8):
                 protocol.set_rail_lights(not protocol.rail_lights_on)
@@ -55,35 +55,30 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.home()
 
     plate = protocol.load_labware('pcr96well_nonskirt_280ul', location = '2')
-    tiprack = protocol.load_labware('axygen_96_diytiprack_10ul', location = '8')
-
+    #tiprack = protocol.load_labware('axygen_96_diytiprack_10ul', location = '8')
+    tiprack =protocol.load_labware('opentrons_96_tiprack_10ul',location = '8')
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tiprack])
 
     pipette.flow_rate.aspirate = 5
     pipette.flow_rate.dispense = 5
 
-    bottom_offset = 0.5
+    bottom_offset = 0.3
 
-    water = plate.wells_by_name()['A1']
+    water = plate.wells_by_name()['A3']
 
-    _pick_up(pipette,location=tiprack.wells_by_name()['A4'])
+    cols_id = ["4","7","10","12"]
 
-    for i in range(11):
+    for i in range(4):
+        _pick_up(pipette,location = tiprack.columns_by_name()[cols_id[i]][0])
         pipette.aspirate(10, water.bottom(bottom_offset))
         #pipette.move_to(water.top(20))
         #time.sleep(2)
-        pipette.dispense(10, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
+        pipette.dispense(10, plate.columns_by_name()[cols_id[i]][0].bottom(bottom_offset))
         #pipette.move_to(plate.columns_by_name()[str(i+2)][0].top(20))
         #time.sleep(2)
+        pipette.drop_tip()
 
     protocol.pause("")
-
-    for i in range(11):
-        pipette.aspirate(10, plate.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
-        #pipette.move_to(water.top(20))
-        #time.sleep(2)
-        pipette.dispense(10, water.bottom(bottom_offset))
-
 
     protocol.comment('Protocol complete!')
 
