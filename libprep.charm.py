@@ -14,15 +14,58 @@ import os
 import subprocess
 
 AUDIO_FILE_PATH = '/var/lib/jupyter/notebooks/reminder_tone.mp3' 
+# custom functions
+
 def run_quiet_process(command): 
     subprocess.check_output('{} &> /dev/null'.format(command), shell=True) 
+
 def speaker(): 
+    """
+    play reminder tone
+    """
     print('Speaker') 
     print('Next\t--> CTRL-C')
     try:
         run_quiet_process('mpg123 {}'.format(AUDIO_FILE_PATH))
     except KeyboardInterrupt:
         print("cancel")
+
+def _pick_up(pipette):
+    """
+    pick up tip, if no tip available, pause and wait for tip replacement
+    """
+    try:
+        pipette.pick_up_tip()
+    except protocol_api.labware.OutOfTipsError:
+        for _ in range(8):
+            protocol.set_rail_lights(not protocol.rail_lights_on)
+            if protocol.rail_lights_on:
+                speaker()
+            protocol.delay(seconds=0.2)
+        protocol.pause("Replace empty tip racks")
+        pipette.reset_tipracks()
+        pipette.pick_up_tip()
+
+def _calc_height(volume, diameter=5.5, bottom_offset=0.3):
+    """
+    calculate liquid height in well.
+    Assume well is a cylinder + cone, Vcone = 71.53 mm^3
+    This is a rough approximation.
+    """
+    height_cone = 0
+    height_cylinder = 0
+
+    if volume <= 71.53:
+        height_cone = volume / (math.pi * (diameter / 2) ** 2) * 3 
+    else:
+        volume -= 71.53
+        height_cylinder = volume / (math.pi * (diameter / 2) ** 2)
+
+    height = height_cone + height_cylinder
+    if height < 0:
+        return 0 + bottom_offset
+    else:
+        return height + bottom_offset
 
 metadata = {
     'protocolName': 'Automated CHARM library prep protocol',
@@ -32,11 +75,11 @@ metadata = {
 
 ################CHARM library prep configuration################
 malbac_product_concentration_columns = [55 for i in range(12)]
-if_dry_run = False
-bottom_offset = 0.5
+if_test_run = False
+bottom_offset = 0.3
 ################End CHARM library prep configuration################
 
-if if_dry_run:
+if if_test_run:
     col_num = 3
 else:
     col_num = 12
@@ -47,7 +90,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.home()
 
     malbac_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
-    reagent_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='9')
+    reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
     dilute_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='3')
     pcr_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
     enrich_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='5')
@@ -55,20 +98,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # load instrument
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=tipracks)
-
-    def _pick_up(pipette):
-        try:
-            pipette.pick_up_tip()
-        except protocol_api.labware.OutOfTipsError:
-            for _ in range(8):
-                protocol.set_rail_lights(not protocol.rail_lights_on)
-                if protocol.rail_lights_on:
-                    speaker()
-                protocol.delay(seconds=0.2)
-            protocol.pause("Replace empty tip racks")
-            pipette.reset_tipracks()
-            pipette.pick_up_tip()
-    
 
     # set flow rate for small volume
     pipette.flow_rate.aspirate = 5  
@@ -92,7 +121,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # transfer water to dilute plate
     _pick_up(pipette)
     for i in range(col_num):
-        pipette.aspirate(water_volume[i], water.bottom(bottom_offset)) 
+        pipette.aspirate(water_volume[i], water.bottom(_calc_height((col_num - i - 1)*water_volume[0])))  # assume water volume is the same in each well
         pipette.dispense(water_volume[i], dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
     pipette.drop_tip()
 
@@ -100,7 +129,7 @@ def run(protocol: protocol_api.ProtocolContext):
     TranspositionMix_volume = 6.15
     _pick_up(pipette)
     for i in range(col_num):
-        pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(bottom_offset))
+        pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(_calc_height((col_num - i - 1)*TranspositionMix_volume)))
         pipette.dispense(TranspositionMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
     pipette.drop_tip()
 
@@ -129,7 +158,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(SDS_volume, SDS.bottom(bottom_offset))
+        pipette.aspirate(SDS_volume, SDS.bottom(_calc_height((col_num - i - 1)*SDS_volume)))
         pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.mix(5, 10,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(half_lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
@@ -175,7 +204,7 @@ def run(protocol: protocol_api.ProtocolContext):
     PCRMix_volume = 9.75
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(PCRMix_volume, PCRMix.bottom(bottom_offset))
+        pipette.aspirate(PCRMix_volume, PCRMix.bottom(_calc_height((col_num - i - 1)*PCRMix_volume))
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.drop_tip()
 
@@ -199,7 +228,7 @@ def run(protocol: protocol_api.ProtocolContext):
     enrich_PCRMix_volume = 11.75
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(bottom_offset))
+        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(_calc_height((col_num - i - 1)*enrich_PCRMix_volume))
         pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.drop_tip()
 
