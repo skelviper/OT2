@@ -75,20 +75,20 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.home()
 
     def _pick_up(pipette):
-    """
-    pick up tip, if no tip available, pause and wait for tip replacement
-    """
-    try:
-        pipette.pick_up_tip()
-    except protocol_api.labware.OutOfTipsError:
-        for _ in range(8):
-            protocol.set_rail_lights(not protocol.rail_lights_on)
-            if protocol.rail_lights_on:
-                speaker()
-            protocol.delay(seconds=0.2)
-        protocol.pause("Replace empty tip racks")
-        pipette.reset_tipracks()
-        pipette.pick_up_tip()
+        """
+        pick up tip, if no tip available, pause and wait for tip replacement
+        """
+        try:
+            pipette.pick_up_tip()
+        except protocol_api.labware.OutOfTipsError:
+            for _ in range(8):
+                protocol.set_rail_lights(not protocol.rail_lights_on)
+                if protocol.rail_lights_on:
+                    speaker()
+                protocol.delay(seconds=0.2)
+            protocol.pause("Replace empty tip racks")
+            pipette.reset_tipracks()
+            pipette.pick_up_tip()
 
     malbac_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
@@ -202,7 +202,7 @@ def run(protocol: protocol_api.ProtocolContext):
     PCRMix_volume = 9.75
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(PCRMix_volume, PCRMix.bottom(_calc_height((col_num - i - 1)*PCRMix_volume))
+        pipette.aspirate(PCRMix_volume, PCRMix.bottom(_calc_height((col_num - i - 1)*PCRMix_volume)))
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.drop_tip()
 
@@ -226,7 +226,7 @@ def run(protocol: protocol_api.ProtocolContext):
     enrich_PCRMix_volume = 11.75
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(_calc_height((col_num - i - 1)*enrich_PCRMix_volume))
+        pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(_calc_height((col_num - i - 1)*enrich_PCRMix_volume)))
         pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.drop_tip()
 
