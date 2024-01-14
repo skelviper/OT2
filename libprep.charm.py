@@ -82,7 +82,7 @@ def run(protocol: protocol_api.ProtocolContext):
         pick up tip, if no tip available, pause and wait for tip replacement
         """
         try:
-            pipette.pick_up_tip()
+            pipette.pick_up_tip(presses=2,increment=1)
         except protocol_api.labware.OutOfTipsError:
             for _ in range(8):
                 protocol.set_rail_lights(not protocol.rail_lights_on)
@@ -91,7 +91,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=0.2)
             protocol.pause("Replace empty tip racks")
             pipette.reset_tipracks()
-            pipette.pick_up_tip()
+            pipette.pick_up_tip(presses=2,increment=1)
 
     malbac_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
