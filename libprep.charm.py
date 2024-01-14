@@ -74,6 +74,9 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.set_rail_lights(True)
     protocol.home()
 
+    # protocol.max_speeds['X'] = 500
+    # protocol.max_speeds['Y'] = 500
+
     def _pick_up(pipette):
         """
         pick up tip, if no tip available, pause and wait for tip replacement
