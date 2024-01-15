@@ -60,7 +60,7 @@ metadata = {
 
 
 bottom_offset = 0.3
-
+if_test_run = False
 if if_test_run:
     col_num = 3
 else:
