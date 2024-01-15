@@ -104,7 +104,7 @@ def run(protocol: protocol_api.ProtocolContext):
     lib_volume = 2
     for i in range(col_num):
         pipette.aspirate(lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.dispense(lib_volume, tube_plate.columns_by_name()['1'][0].bottom(bottom_offset))
+        pipette.dispense(lib_volume, tube_plate.columns_by_name()['1'][0].bottom(_calc_height(120)))
         #pipette.drop_tip()
     pipette.drop_tip()
 
