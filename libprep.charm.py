@@ -1,8 +1,8 @@
 """
 Automated CHARM library prep protocol
 @Author: zliu
-@Version: 0.2
-@Date: 2023-11-15
+@Version: 1.0
+@Date: 2024-1-16
 """
 
 from opentrons import protocol_api
