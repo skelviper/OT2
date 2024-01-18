@@ -92,17 +92,15 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.home()
 
     # load instrument
+    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4']]
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=tipracks)
 
     i5_index = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
     i7_index = protocol.load_labware('pcr96well_nonskirt_280ul',location='3')
     mix_index = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
 
-    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4']]
-
-
     index_volume = 20
-    transfer_times = 3
+    transfer_times = 1
 
     for i in range(col_num):
         _pick_up(pipette)
@@ -119,10 +117,10 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(transfer_times):
             pipette.aspirate(index_volume, i7_index.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
             pipette.dispense(index_volume, mix_index.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        if i != col_num-1:
-            pipette.drop_tip(home_after=False)
-        else:
-            pipette.drop_tip()
+            if i != col_num-1:
+                pipette.drop_tip(home_after=False)
+            else:
+                pipette.drop_tip()
 
 
     protocol.comment('Protocol complete!')
