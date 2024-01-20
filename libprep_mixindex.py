@@ -20,7 +20,7 @@ metadata = {
 }
 
 ################library prep configuration################
-malbac_product_concentration_columns = [35 for i in range(12)]
+malbac_product_concentration_columns = [45.7 for i in range(12)]
 if_dry_run = False
 bottom_offset = 0.3
 ################End library prep configuration############
