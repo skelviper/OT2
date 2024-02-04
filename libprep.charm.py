@@ -93,11 +93,11 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.reset_tipracks()
             pipette.pick_up_tip(presses=2,increment=1)
 
-    malbac_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
+    malbac_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='6')
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
-    dilute_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='3')
-    pcr_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
-    enrich_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='5')
+    dilute_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='3')
+    pcr_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='2')
+    enrich_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='5')
     tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','7','8','10','11']]
 
     # load instrument
@@ -182,8 +182,8 @@ def run(protocol: protocol_api.ProtocolContext):
     del protocol.deck['3']
     del protocol.deck['6']
 
-    i5_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
-    i7_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='3')
+    i5_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='6')
+    i7_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='3')
 
     # transfer i5 index to pcr plate,
     # split pcr plate into two plates, one for Hi-C library, one for MALBAC library
