@@ -36,7 +36,7 @@ def _calc_height(volume, diameter=5.5, bottom_offset=0.3):
     Assume well is a cylinder + cone, Vcone = 71.53 mm^3
     This is a rough approximation.
     """
-    height_cone = 0
+    #height_cone = 0
     height_cylinder = 0
 
     #if volume <= 100:
@@ -45,7 +45,7 @@ def _calc_height(volume, diameter=5.5, bottom_offset=0.3):
     #    volume -= 100
     height_cylinder = volume / (math.pi * (diameter / 2) ** 2)
 
-    #height = height_cone + height_cylinder
+    #height = height_cone + heigh t_cylinder
     height = height_cylinder
     if height < 0:
         return 0 + bottom_offset
@@ -130,7 +130,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.drop_tip()
 
     # transfer TranspositionMix to pcr plate
-    TranspositionMix_volume = 6.18
+    TranspositionMix_volume = 6.2
     _pick_up(pipette)
     for i in range(col_num):
         pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(_calc_height((col_num - i - 1)*TranspositionMix_volume)))
@@ -146,7 +146,10 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.aspirate(malbac_product_volume*2, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume*2, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.mix(5,8,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
 
     # Pause for Tn5 reaction
     for _ in range(8):
@@ -167,7 +170,10 @@ def run(protocol: protocol_api.ProtocolContext):
         pipette.mix(5, 10,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(half_lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(half_lib_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
     
     # replace 3 and 6 with i5/i7 index , while SDS reaction
     for _ in range(8):
@@ -194,12 +200,18 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i5_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
     for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i7_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
 
     # transfer PCR mix to pcr plate
     PCRMix_volume = 9.75
@@ -207,7 +219,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(PCRMix_volume, PCRMix.bottom(_calc_height((col_num - i - 1)*PCRMix_volume)))
         pipette.dispense(PCRMix_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
 
     # Pause for library amplification
     for _ in range(8):
@@ -223,7 +238,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i5_volume, i5_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i5_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
 
     # transfer enriched PCR mix to enrich plate
     enrich_PCRMix_volume = 11.75
@@ -231,7 +249,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(enrich_PCRMix_volume, enrich_PCRMix.bottom(_calc_height((col_num - i - 1)*enrich_PCRMix_volume)))
         pipette.dispense(enrich_PCRMix_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
 
     # Pause for library amplification
     for _ in range(8):
@@ -247,7 +268,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i7_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
     
     # Pause for library amplification
     for _ in range(8):
