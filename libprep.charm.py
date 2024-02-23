@@ -59,7 +59,7 @@ metadata = {
 }
 
 ################CHARM library prep configuration################
-malbac_product_concentration_columns = [55 for i in range(12)]
+malbac_product_concentration_columns = [25 for i in range(12)]
 if_test_run = False
 bottom_offset = 0.3
 ################End CHARM library prep configuration################
@@ -130,7 +130,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.drop_tip()
 
     # transfer TranspositionMix to pcr plate
-    TranspositionMix_volume = 6.15
+    TranspositionMix_volume = 6.18
     _pick_up(pipette)
     for i in range(col_num):
         pipette.aspirate(TranspositionMix_volume, TranspositionMix.bottom(_calc_height((col_num - i - 1)*TranspositionMix_volume)))
@@ -142,7 +142,7 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 12,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.mix(5, 8,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(malbac_product_volume*2, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume*2, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.mix(5,8,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))

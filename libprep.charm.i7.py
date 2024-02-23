@@ -94,8 +94,8 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.pick_up_tip(presses=2,increment=1)
 
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
-    pcr_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
-    enrich_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='5')
+    pcr_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='2')
+    enrich_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='5')
     tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','7','8','10','11']]
 
     # load instrument
@@ -113,8 +113,8 @@ def run(protocol: protocol_api.ProtocolContext):
     PCRMix = reagent_plate.wells_by_name()['A4']
     enrich_PCRMix = reagent_plate.wells_by_name()['A5']
 
-    i5_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='6')
-    i7_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='3')
+    i5_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='6')
+    i7_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='3')
 
     # trnasfer i7 index to enrich plate
     i7_volume = 2
