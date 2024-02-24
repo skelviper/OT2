@@ -3,7 +3,7 @@ Automated CHARM library prep protocol
 @Author: zliu
 @Version: 2.0
 @Date: 2024-2-23
-"""s
+"""
 
 from opentrons import protocol_api
 # import opentrons.execute # in jupyter
@@ -96,7 +96,7 @@ def run(protocol: protocol_api.ProtocolContext):
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
     pcr_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='2')
     enrich_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='5')
-    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','7','8','10','11']]
+    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1']]
 
     # load instrument
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=tipracks)
@@ -132,5 +132,5 @@ def run(protocol: protocol_api.ProtocolContext):
         if protocol.rail_lights_on:
             speaker()
         protocol.delay(seconds=0.2)
-    protocol.comments('Please replace 3 and 6 with i5/i7 index, while SDS reaction (Set timer manually for 10 min)')
+    protocol.comment('Please replace 3 and 6 with i5/i7 index, while SDS reaction (Set timer manually for 10 min)')
     

@@ -96,7 +96,7 @@ def run(protocol: protocol_api.ProtocolContext):
     reagent_plate = protocol.load_labware('xinglab_8stripetube',location='9')
     pcr_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='2')
     enrich_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='5')
-    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4','7','8','10','11']]
+    tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1']]
 
     # load instrument
     pipette = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=tipracks)
