@@ -122,7 +122,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(i7_volume, i7_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(i7_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.drop_tip()
+        if i != col_num-1:
+            pipette.drop_tip(home_after=False)
+        else:
+            pipette.drop_tip()
     
     # Pause for library amplification
     for _ in range(8):
