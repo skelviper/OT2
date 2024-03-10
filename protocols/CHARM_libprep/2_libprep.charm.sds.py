@@ -111,14 +111,14 @@ def run(protocol: protocol_api.ProtocolContext):
     SDS = reagent_plate.wells_by_name()['A3']
 
     # transfer SDS to pcr plate and split the library into two plates(Hi-C & Enrich)
-    SDS_volume = 2.5
-    half_lib_volume = 6.25
+    SDS_volume = 2.2
+    half_lib_volume = 6.1
 
     for i in range(col_num):
         _pick_up(pipette)
         pipette.aspirate(SDS_volume, SDS.bottom(_calc_height((col_num - i - 1)*SDS_volume)))
         pipette.dispense(SDS_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 10,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.mix(10, 10,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(half_lib_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(half_lib_volume, enrich_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         if i != col_num-1:

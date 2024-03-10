@@ -139,10 +139,10 @@ def run(protocol: protocol_api.ProtocolContext):
         _pick_up(pipette)
         pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5, 8,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.mix(8, 8,rate=20,location = dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         pipette.aspirate(malbac_product_volume*2, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume*2, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
-        pipette.mix(5,8,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
+        pipette.mix(8,8,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         if i != col_num-1:
             pipette.drop_tip(home_after=False)
         else:
