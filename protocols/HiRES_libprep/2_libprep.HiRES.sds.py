@@ -130,5 +130,5 @@ def run(protocol: protocol_api.ProtocolContext):
         if protocol.rail_lights_on:
             speaker()
         protocol.delay(seconds=0.2)
-    protocol.comments('Please replace 3 and 6 with i5/i7 index, while SDS reaction (Set timer manually for 10 min)')
+    protocol.comment('Please replace 3 and 6 with i5/i7 index, while SDS reaction (Set timer manually for 10 min)')
     
