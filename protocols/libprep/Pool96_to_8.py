@@ -88,7 +88,7 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.pick_up_tip(presses=2,increment=1)
 
     tube_plate = protocol.load_labware('xinglab_8stripetube',location='3')
-    pcr_plate = protocol.load_labware('pcr96well_nonskirt_280ul',location='2')
+    pcr_plate = protocol.load_labware('xinglab_pcr96well_semiskirt_280ul',location='2')
 
     tipracks = [protocol.load_labware('axygen_96_diytiprack_10ul',location=s) for s in ['1','4']]
 
