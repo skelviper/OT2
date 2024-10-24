@@ -124,7 +124,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # transfer malbac products to dilute plate, mix, and transfer to pcr plate
     for i in range(col_num):
         _pick_up(pipette)
-        pipette.aspirate(malbac_product_volume, dilute_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+        pipette.aspirate(malbac_product_volume, malbac_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.dispense(malbac_product_volume, pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
         pipette.mix(5,4,rate=20, location = pcr_plate.columns_by_name()[str(i+1)][0].bottom(bottom_offset+1))
         if i != col_num-1:
