@@ -53,7 +53,7 @@ def _calc_height(volume, diameter=5.5, bottom_offset=0.3):
         return height + bottom_offset
 
 metadata = {
-    'protocolName': 'CHARM library prep: 4.Enrich i7',
+    'protocolName': 'HiRES library prep: 4.Enrich i7',
     'author': 'zliu <skelviper@hotmail.com>',
     'apiLevel': '2.13' 
 }

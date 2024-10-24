@@ -3,7 +3,7 @@ Automated CHARM library prep protocol
 @Author: zliu
 @Version: 2.0
 @Date: 2024-2-23
-"""s
+"""
 
 from opentrons import protocol_api
 # import opentrons.execute # in jupyter
@@ -53,7 +53,7 @@ def _calc_height(volume, diameter=5.5, bottom_offset=0.3):
         return height + bottom_offset
 
 metadata = {
-    'protocolName': 'CHARM library prep: 2.SDS',
+    'protocolName': 'HiRES library prep: 2.SDS',
     'author': 'zliu <skelviper@hotmail.com>',
     'apiLevel': '2.13' 
 }
