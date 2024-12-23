@@ -75,7 +75,9 @@ def run(protocol: protocol_api.ProtocolContext):
     i = 1
     _pick_up(pipette)
     bottom_offset = 1
+    protocol.max_speeds['Z'] = 20
     pipette.aspirate(5, tubes.columns_by_name()[str(i+1)][0].bottom(bottom_offset))
+    protocol.max_speeds['Z'] = 100
     pipette.dispense(5, tubes.columns_by_name()[str(i+2)][0].bottom(bottom_offset))
     pipette.drop_tip()
 
